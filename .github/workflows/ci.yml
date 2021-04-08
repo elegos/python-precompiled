@@ -1,7 +1,7 @@
 name: CI
 on:
   schedule:
-    - cron: "29 22 * * *"
+    - cron: "31 22 * * *"
 
 jobs:
   build_images:
@@ -10,30 +10,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       -name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Setup python environment
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
           architecture: 'x64'
-
       - name: Install pipenv
         uses: BSFishy/pip-action@v1
         with:
           packages: |
             pipenv
-
       - name: Generate Python docker folders
         run: |
           pipenv install \
           && pipenv run python3 update.py
-      
       - name: Build docker image
         run: |
           for version in $(ls -1 docker); do \
@@ -42,7 +37,6 @@ jobs:
             docker push giacomofurlan/python-precompiled:$version; \
             popd; \
           done
-
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:

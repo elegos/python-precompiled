@@ -64,6 +64,11 @@ RUN set -ex \
   -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) \) \
   \) -exec rm -rf '{}' +
 
+RUN ln -sr /opt/python/${PYTHON_VERSION} /opt/python/$(echo $PYTHON_VERSION | sed 's/\.[0-9]*$//')
+RUN ln -sr /opt/python/${PYTHON_VERSION} /opt/python/$(echo $PYTHON_VERSION | sed 's/\.[0-9]\.[0-9]*$//')
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 # Default entrypoint copies Python into the input path
-# i.e. docker run ... /usr/
-ENTRYPOINT ["cp", "-r", "/opt/python/${PYTHON_VERSION}/*"]
+# i.e. docker run --user "`id -u`:`id -g`" ... /usr/
+ENTRYPOINT ["/entrypoint.sh"]

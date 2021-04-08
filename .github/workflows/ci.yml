@@ -1,36 +1,30 @@
 name: CI
 on:
   schedule:
-    - cron: "* 2 * * *"
+    - cron: "29 22 * * *"
 
 jobs:
-  generate_matrix:
+  build_images:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Generate matrix
-        id: generate_matrix
-        uses: ./.github/actions/matrix-generator
+      -name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  build_images:
-    runs-on: ubuntu-latest
-    needs: [generate_matrix]
-    strategy:
-      matrix:
-        # version: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
-        version: ["3.6.13", "3.7.10", "3.8.9", "3.9.4"]
-      # fail-fast: true
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Setup python environment
+        uses: actions/setup-python@v2
         with:
           python-version: '3.x'
           architecture: 'x64'
-      - uses: BSFishy/pip-action@v1
+
+      - name: Install pipenv
+        uses: BSFishy/pip-action@v1
         with:
           packages: |
             pipenv
@@ -42,6 +36,18 @@ jobs:
       
       - name: Build docker image
         run: |
-          pushd docker/v${{ matrix.version }} \
-          docker build . --tag giacomofurlan/python-precompiled:v${{ matrix.version }} \
-          && popd
+          for version in $(ls -1 docker); do \
+            pushd docker/${version}; \
+            docker build . --tag giacomofurlan/python-precompiled:$version; \
+            docker push giacomofurlan/python-precompiled:$version; \
+            popd; \
+          done
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          author_email: giacomo+ci@giacomofurlan.name
+          author_name: Giacomo Furlan (CI)
+          message: Automated update of Dockerfiles
+          branch: main

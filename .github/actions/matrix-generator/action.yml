@@ -1,0 +1,13 @@
+name: "Python versions generator"
+description: "Generates the docker files for the latest python versions"
+branding:
+  color: blue
+  icon: filter
+outputs:
+  matrix:
+    description: "The list of Python versions detected"
+runs:
+  using: 'docker'
+  image: 'debian:buster-slim'
+  run: |
+    ./update.py

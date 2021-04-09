@@ -2,6 +2,8 @@
 
 This project aims to daily build docker images published on Docker Hub with the latest Python 3.x versions (3.6+).
 
+Daily CI builds are pushed on [Docker Hub](https://hub.docker.com/r/giacomofurlan/python-precompiled)
+
 ## How it works
 The CI github workflow runs update.py, which finds the latest Python 3.x versions (the latest patch for each minor),
 builds the relative image and publishes it under giacomofurlan/python-precompiled:v3.x.y

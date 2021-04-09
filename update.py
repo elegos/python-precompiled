@@ -4,9 +4,7 @@ from os import path
 from pathlib import Path
 from typing import List
 
-from git import Repo
 from git.cmd import Git
-from git.refs.tag import Tag
 import shutil
 import re
 
@@ -25,7 +23,6 @@ class PythonVersion:
     major: int
     minor: int
     patch: int
-    rank: int = field(default=0)
 
 
 gpgKeys = {
@@ -83,7 +80,7 @@ for tag in tags:
         # In case there is no major, minor or patch versions
         pass
 
-outputMatrix = []
+# outputMatrix = []
 with open(path.sep.join([curDir, 'Dockerfile.template']), 'r') as templateFile:
     template = templateFile.read()
 
@@ -91,7 +88,7 @@ with open(path.sep.join([curDir, 'Dockerfile.template']), 'r') as templateFile:
         for minor, version in pythonVersions[major].items():
             pythonVersion = version.tag
             gpgKey = gpgKeys[major][minor]
-            outputMatrix.append(f'"{major}.{minor}.{version.patch}"')
+            # outputMatrix.append(f'"{major}.{minor}.{version.patch}"')
 
             print(pythonVersion, gpgKey)
 
@@ -108,4 +105,4 @@ with open(path.sep.join([curDir, 'Dockerfile.template']), 'r') as templateFile:
             shutil.copy(path.sep.join([curDir, 'entrypoint_template.sh']), path.sep.join(
                 [destDir, 'entrypoint.sh']))
 
-print(f'::set-output name=matrix::[{",".join(outputMatrix)}]')
+# print(f'::set-output name=matrix::[{",".join(outputMatrix)}]')

@@ -6,7 +6,9 @@ Daily CI builds are pushed on [Docker Hub](https://hub.docker.com/r/giacomofurla
 
 ## How it works
 The CI github workflow runs update.py, which finds the latest Python 3.x versions (the latest patch for each minor),
-builds the relative image and publishes it under giacomofurlan/python-precompiled:v3.x.y
+builds the relative image and publishes it under giacomofurlan/python-precompiled:v3.x.y.
+
+The flow continues pushing all the images to [docker hub](https://hub.docker.com/r/giacomofurlan/python-precompiled).
 
 ## Docker images
 The produced images have a default entrypoint (`/entrypoint.sh`) which will copy the files in the given directory

@@ -33,8 +33,11 @@ jobs:
         run: |
           for version in $(ls -1 docker); do \
             pushd docker/${version}; \
-            docker build . --tag giacomofurlan/python-precompiled:$version; \
+            docker build . \
+              --tag giacomofurlan/python-precompiled:$version \
+              --tag giacomofurlan/python-precompiled:$(echo $version | sed 's/\.[0-9]*$//'); \
             docker push giacomofurlan/python-precompiled:$version; \
+            docker push giacomofurlan/python-precompiled:$(echo $version | sed 's/\.[0-9]*$//'); \
             popd; \
           done
       - name: Commit & Push changes
